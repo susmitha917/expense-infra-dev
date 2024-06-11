@@ -5,7 +5,6 @@ pipeline {
     options {
         timeout(time: 30, unit: 'MINUTES')
         disableConcurrentBuilds()
-        ansiColor('xterm')
     }
     parameters {
         choice(name: 'action', choices: ['Apply', 'Destroy'], description: 'Pick something')
@@ -13,10 +12,12 @@ pipeline {
     stages {
         stage('Init') {
             steps {
-               sh """
-                cd 01-vpc
-                terraform init -reconfigure
-               """
+                wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'xterm']) {
+                    sh """
+                    cd 01-vpc
+                    terraform init -reconfigure
+                    """
+                }
             }
         }
         stage('Plan') {
@@ -26,10 +27,12 @@ pipeline {
                 }
             }
             steps {
-                sh """
-                cd 01-vpc
-                terraform plan
-                """
+                wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'xterm']) {
+                    sh """
+                    cd 01-vpc
+                    terraform plan
+                    """
+                }
             }
         }
         stage('Deploy') {
@@ -43,13 +46,14 @@ pipeline {
                 ok "Yes, we should."
             }
             steps {
-                sh """
-                cd 01-vpc
-                terraform apply -auto-approve
-                """
+                wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'xterm']) {
+                    sh """
+                    cd 01-vpc
+                    terraform apply -auto-approve
+                    """
+                }
             }
         }
-
         stage('Destroy') {
             when {
                 expression{
@@ -57,10 +61,12 @@ pipeline {
                 }
             }
             steps {
-                sh """
-                cd 01-vpc
-                terraform destroy -auto-approve
-                """
+                wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'xterm']) {
+                    sh """
+                    cd 01-vpc
+                    terraform destroy -auto-approve
+                    """
+                }
             }
         }
     }
